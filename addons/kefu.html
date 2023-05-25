@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>在线客服</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <!-- 在线客服依赖以下css和js文件,请按需引入 -->
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/assets/addons/kefu/css/kefu_default.css" rel="stylesheet">
+
+    <script src=/assets/libs/jquery/dist/jquery.min.js></script>
+    <script src="/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/assets/libs/fastadmin-layer/dist/layer.js"></script>
+    <script src="/assets/addons/kefu/js/kefu.js"></script>
+    <!--script src="/assets/addons/kefu/js/jquery.md5.js"></script>
+    <script src="/assets/addons/kefu/js/jquery.json-2.3.min.js"></script>
+    <script src="/assets/addons/kefu/js/niuniucapture.js"></script>
+    <script src="/assets/addons/kefu/js/capturewrapper.js"></script-->
+    <style>
+        .kefu_img {
+            display: none;
+        }
+
+        .bubble {
+            background-blend-mode: normal, normal;
+            box-shadow: 0rem 0.1rem 0.3rem 0rem #d9dfe4;
+            border-radius: 0rem 1.3rem 1.3rem 1.3rem;
+        }
+
+        .KeFu .modal-body .kefu-left .chat {
+            background-image: linear-gradient( #f4f8fb, #f4f8fb), linear-gradient( #e6e6e6, #e6e6e6);
+        }
+
+        @media (max-width:1340px) {
+            .KeFu .modal-body .kefu-left .chat {
+                height: calc(100% - 177px);
+            }
+        }
+
+        @media (max-width:1084px) {
+            .KeFu .modal-body .kefu-left .chat {
+                height: calc(100% - 210px);
+            }
+        }
+
+        @media (min-width:1001px) {
+            #KeFuModal .modal-dialog.modal-lg .modal-content .modal-body {
+                display: flex;
+                padding: 0;
+            }
+            .modal-header {
+                background-color: #0a8ff5 !important;
+                border-bottom: none !important;
+            }
+            #csr_status {
+                color: #fff !important;
+            }
+            button.close {
+                font-size: 2.5rem;
+                color: #fff !important;
+                opacity: 1 !important;
+            }
+            .KeFu .modal-body {
+                height: 85% !important;
+            }
+            .KeFu .modal-body .kefu-left {
+                overflow: unset !important;
+            }
+            .KeFu .modal-body .announcement {
+                height: auto !important;
+                white-space: normal !important;
+                text-overflow: unset !important;
+            }
+            #KeFuModal .modal-dialog.modal-lg .modal-content {
+                height: 100%;
+            }
+            #KeFuModal .modal-dialog {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+            }
+            .rightside img {
+                width: 100%;
+                padding: 5px;
+            }
+            .kefu_img {
+                display: block;
+                height: 110%;
+                padding: 5px;
+                /*-webkit-box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);*/
+            }
+            .KeFu .modal-body .kefu-right {
+                height: 110% !important;
+            }
+            .mail-body .kefu-right {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .rightside {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        .KeFu .modal-body .kefu-left .write pre {
+            border: 2px solid #6f6b6b59 !important;
+        }
+
+        .KeFu .modal-body .kefu-left .write .write_top {
+            padding: 4px !important;
+        }
+
+        .KeFu .modal-body .kefu-left .write #chatfile {
+            cursor: pointer;
+        }
+
+        .KeFu .modal-body .kefu-left .write #send_tis {
+            margin-left: 25px !important;
+            color: #fff;
+        }
+
+        .write .write_top {
+            border-top: 2px solid #6f6b6b59 !important;
+            border-right: 2px solid #6f6b6b59 !important;
+            border-left: 2px solid #6f6b6b59 !important;
+            border-bottom: none !important;
+            background: #00b0ff;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .img-heart {
+            animation-name: heartbeat;
+            animation-duration: 1s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes heartbeat {
+            0% {
+                transform: scale(0.9);
+            }
+            50% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(0.9);
+            }
+        }
+
+        .bubble-container {
+            display: flex;
+            flex-direction: row;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .bubble-container.me {
+            justify-content: start;
+        }
+
+        .bubble-container img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+
+        #kefu_chat_slide_f .item img {
+            cursor: pointer;
+        }
+
+        .ovf {
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+        }
+
+        .cur2c:hover {
+            color: #2c6ee5;
+        }
+
+        .cur:hover {
+            cursor: pointer;
+        }
+
+        .lin4 {
+            line-height: 40px;
+            height: 40px !important;
+        }
+
+        .lic1 {
+            -webkit-line-clamp: 1;
+            line-clamp: 1;
+        }
+    </style>
+</head>
+<!--script type="text/javascript">
+    $().ready(function () {
+      $("#moreparams").hide()
+
+      $("#captureselectSize").click(function () {
+        var autoFlag =
+          $("#captureselectSize").attr("checked") == "checked" ? 1 : 0
+        if (autoFlag == 1) {
+          $("#moreparams").show()
+        } else {
+          $("#moreparams").hide()
+        }
+      })
+      $("#getimagefromclipboard").click(function () {
+        $("#posdetail").hide()
+      })
+      $("#showprewindow").click(function () {
+        $("#posdetail").hide()
+      })
+      $("#fullscreen").click(function () {
+        $("#posdetail").hide()
+      })
+      $("#specificarea").click(function () {
+        $("#posdetail").show()
+      })
+
+      $("#showprewindow").click()
+      $("#autoupload").click()
+      $("#btnUpload").hide()
+      Init()
+    })
+  </script-->
+
+<body>
+    <script type="text/javascript">
+        KeFu.initialize(document.domain, 'index', function() {
+            KeFu.toggle_window('show'); // 打开窗口
+        });
+        // 参数一为在线客服所在网站的域名(启动Workerman服务的网站的域名)
+        // 参数二为模块名,站外直接填写index
+        // 参数三为初始化完成后的回调方法
+        // 参数四为指定客服，可在此处填写客服代表的后台账户id
+        // 若要站外调用，请于后台-》插件管理-》本插件的配置中-》跨站调用允许域名-》填写外站的域名
+    </script>
+    <!--script src="http://8099-phpkefu-test.5200.mobi/assets/addons/kefu/js/html2canvas.min.js"></script-->
+    <script>
+        function insertImage() {
+            // get the modal dialog element
+            var modalDialog = document.querySelector("#KeFuModal");
+            if (modalDialog === null) {
+                location.reload();
+            } else {
+                // create the image element
+                var img = document.createElement("img");
+                img.src = "/assets/addons/kefu/img/side_logo.webp";
+                img.classList.add("kefu_img");
+
+                // insert the image into the modal dialog
+                //modalDialog.querySelector(".modal-dialog .modal-content .modal-body").appendChild(img);
+                // get the modal body element
+                var modalBody = modalDialog.querySelector(".modal-dialog .modal-content .modal-body");
+
+                // append the img element on top of the modal body element
+                modalBody.insertBefore(img, modalBody.firstChild);
+
+                //rightside image
+                // Create the rightside div element
+                var rightsideDiv = document.createElement("div");
+                rightsideDiv.className = "rightside";
+
+                // Create the image element
+                var linkElement1 = document.createElement("a");
+                linkElement1.href = "https://489899.com/";
+                linkElement1.target = "_blank";
+                var imageElement = document.createElement("img");
+                imageElement.src = "http://8099-phpkefu-test.5200.mobi/assets/addons/kefu/img/right1.jpg";
+                imageElement.alt = "Image";
+                //image2
+                var linkElement2 = document.createElement("a");
+                linkElement2.href = "https://489899.com/";
+                linkElement2.target = "_blank";
+                var imageElement2 = document.createElement("img");
+                imageElement2.src = "http://8099-phpkefu-test.5200.mobi/assets/addons/kefu/img/right2.jpg";
+                imageElement2.alt = "Image";
+                //image3
+                var linkElement3 = document.createElement("a");
+                linkElement3.href = "https://80990888.com/";
+                linkElement3.target = "_blank";
+                var imageElement3 = document.createElement("img");
+                imageElement3.src = "http://8099-phpkefu-test.5200.mobi/assets/addons/kefu/img/right3.jpg";
+                imageElement3.alt = "Image";
+                //imageElement3.className ="img-heart";
+
+                //Append the image element to the rightside div
+                //  linkElement1.appendChild(imageElement);
+                // rightsideDiv.appendChild(linkElement1);
+                //img2
+                //  linkElement2.appendChild(imageElement2);
+                //  rightsideDiv.appendChild(linkElement2);
+                //img3
+                // linkElement3.appendChild(imageElement3);
+                // rightsideDiv.appendChild(linkElement3);
+                // Find the kefu-right div element
+
+
+                //adding auto reply chat buttons//
+
+                var arrQuestions = ["如何注册账号", "如何存款问题", "如何取款问题", "手机APP下载", "绑定银行卡", "更换提款银行"];
+                var divElements = document.getElementsByClassName("kefu-right");
+                for (var i = 0; i < divElements.length; i++) {
+                    var divElement = divElements[i];
+                    for (var j = 0; j < arrQuestions.length; j++) {
+                        var div_elements = document.createElement("div");
+                        div_elements.className = "lin4 ovf lic1 cur2c cur";
+                        div_elements.title = arrQuestions[j];
+                        div_elements.onclick = function(question) {
+                            return function() {
+                                KeFu.sendMessage(question, 0);
+                                var kefuScroll = document.getElementById('kefu_scroll');
+                                setTimeout(function() {
+                                    kefuScroll.focus();
+                                }, 0);
+                            }
+                        }(arrQuestions[j]);
+                        div_elements.innerHTML = "  ◆  " + arrQuestions[j];
+
+                        divElement.appendChild(div_elements);
+                    }
+                }
+
+                var kefuRightDiv = document.querySelector(".kefu-right");
+                //slider click
+                var imageElements = document.querySelectorAll("#kefu_chat_slide_f .item img");
+
+                // Add onclick function to each image element
+                imageElements.forEach(function(imageElement) {
+                    imageElement.onclick = function() {
+                        // Open the link in a new tab
+                        window.open("https://80990888.com/", "_blank");
+                    };
+                });
+
+                // Insert the rightside div after the kefu-right div
+                kefuRightDiv.appendChild(rightsideDiv);
+
+                //kefuRightDiv.parentNode.insertBefore(rightsideDiv, kefuRightDiv.nextSibling);
+                var kefuMessageElement = document.getElementById("kefu_message");
+                var placeholder = "在这里输入您的信息...";
+
+                // Set the initial placeholder
+                kefuMessageElement.textContent = placeholder;
+
+                // Add focus event listener
+                kefuMessageElement.addEventListener("focus", function() {
+                    // Clear the placeholder if it matches the current content
+                    if (kefuMessageElement.textContent === placeholder) {
+                        kefuMessageElement.textContent = "";
+                    }
+                });
+
+                // Add blur event listener
+                kefuMessageElement.addEventListener("blur", function() {
+                    // Restore the placeholder if the field is empty
+                    if (kefuMessageElement.textContent === "") {
+                        kefuMessageElement.textContent = placeholder;
+                    }
+                });
+
+            }
+            //addIcons();
+        }
+
+        // delay the execution of the insertImage() function by 1000 milliseconds (1 second)
+        setTimeout(insertImage, 300);
+
+        function addIcons() {
+            // Get the parent element
+            var selectFile = document.querySelector('.write_top');
+
+            // Create the first icon element
+            var icon1 = document.createElement('a');
+            icon1.className = 'attach toolbar_icon btn';
+            icon1.id = "btnCapture";
+            icon1.href = "javascript:StartCapture()";
+            icon1.title = "Screen Capture";
+            icon1.style.background = "url('http://8099-phpkefu-test.5200.mobi/assets/addons/kefu/img/cut.png') no-repeat center";
+            icon1.style.backgroundSize = '80% 80%';
+
+            // Create the second icon element
+            // Append both elements to the parent element
+            var parentElement = document.querySelector('.select_file').parentNode;
+            parentElement.insertBefore(icon1, document.querySelector('.select_file').nextSibling);
+        }
+    </script>
+    <!--script>
+      setTimeout(function () {
+      	// Get the capture button element
+	// Get the capture button element
+      var captureButton = document.getElementById("capture")
+
+      // Add a click event listener to the capture button
+      captureButton.addEventListener("click", function () {
+        // Create a transparent overlay div to cover the entire screen
+        var overlay = document.createElement("div")
+        overlay.style.position = "fixed"
+        overlay.style.top = "0"
+        overlay.style.left = "0"
+        overlay.style.width = "100%"
+        overlay.style.height = "100%"
+        overlay.style.backgroundColor = "transparent"
+        overlay.style.cursor = "crosshair"
+        overlay.style.zIndex = "9999"
+
+        // Add the overlay div to the document body
+        document.body.appendChild(overlay)
+
+        var startX, startY, highlight
+
+        // Function to remove the overlay and highlight div
+        function removeOverlay() {
+          document.body.removeChild(overlay)
+          document.removeEventListener("keydown", handleKeyDown)
+        }
+
+        // Add a mousedown event listener to the overlay div
+        overlay.addEventListener("mousedown", function (event) {
+          startX = event.clientX
+          startY = event.clientY
+
+          // Create a highlight div to show the selected area
+          highlight = document.createElement("div")
+          highlight.style.position = "absolute"
+          highlight.style.top = startY + "px"
+          highlight.style.left = startX + "px"
+          highlight.style.width = "0"
+          highlight.style.height = "0"
+          highlight.style.border = "2px dashed red"
+          highlight.style.backgroundColor = "transparent" // Set background color to transparent
+          highlight.style.pointerEvents = "none"
+
+          // Add the highlight div to the overlay div
+          overlay.appendChild(highlight)
+
+          // Add a mousemove event listener to the overlay div
+          overlay.addEventListener("mousemove", function (event) {
+            // Calculate the width and height of the selected area
+            var width = event.clientX - startX
+            var height = event.clientY - startY
+
+            // Update the highlight div with the new dimensions
+            highlight.style.width = Math.abs(width) + "px"
+            highlight.style.height = Math.abs(height) + "px"
+          })
+
+          // Add a mouseup event listener to the overlay div
+          overlay.addEventListener("mouseup", function (event) {
+            // Calculate the width and height of the selected area
+            var width = event.clientX - startX
+            var height = event.clientY - startY
+
+            // Use html2canvas to capture the selected area
+            html2canvas(document.body, {
+              x: startX,
+              y: startY,
+              width: Math.abs(width),
+              height: Math.abs(height),
+            }).then(function (canvas) {
+              // Convert the canvas content to a data URL representing the captured image
+              var dataURL = canvas.toDataURL()
+
+              // Create a new image element
+              var imageElement = new Image()
+
+              // Set the source of the image element to the captured image data
+              imageElement.src = dataURL
+
+              // Get the kefu_message element
+              var kefuMessageElement = document.getElementById("kefu_message")
+
+              // Append the image element to the kefu_message element
+              kefuMessageElement.appendChild(imageElement)
+
+              // Create a file name based on the current date and time
+              var currentDate = new Date()
+              var year = currentDate.getFullYear()
+              var month = currentDate.getMonth() + 1
+              var day = currentDate.getDate()
+              var hours = currentDate.getHours()
+              var minutes = currentDate.getMinutes()
+              var seconds = currentDate.getSeconds()
+              var fileName = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}.png`
+
+              // Create a form data object to send the image file
+              var formData = new FormData()
+              formData.append("file", dataURItoBlob(dataURL), fileName)
+
+              // Send the image file to the server
+              fetch("http://8099-phpkefu-test.5200.mobi/uploads", {
+                method: "POST",
+                body: formData,
+              }).then(function (response) {
+                // Handle the response from the server
+                console.log("Image saved successfully")
+              })
+
+              // Remove the overlay and highlight div
+              removeOverlay()
+            })
+
+            // Remove the mousemove and mouseup event listeners
+            overlay.removeEventListener("mousemove", arguments.callee)
+            overlay.removeEventListener("mouseup", arguments.callee)
+          })
+
+          // Remove the mousedown event listener
+          overlay.removeEventListener("mousedown", arguments.callee)
+        })
+
+        // Function to handle keydown event
+        function handleKeyDown(event) {
+          if (event.key === "`" || event.key === "Escape") {
+            // Remove the overlay and highlight div
+            removeOverlay()
+          }
+        }
+
+        // Add a keydown event listener to the document
+        document.addEventListener("keydown", handleKeyDown)
+      })
+
+      // Function to convert data URI to Blob
+      function dataURItoBlob(dataURI) {
+        var byteString = atob(dataURI.split(",")[1])
+        var mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0]
+        var ab = new ArrayBuffer(byteString.length)
+        var ia = new Uint8Array(ab)
+        for (var i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i)
+        }
+        return new Blob([ab], { type: mimeString })
+      }
+      },1000);
+    </script-->
+</body>
+
+</html>
